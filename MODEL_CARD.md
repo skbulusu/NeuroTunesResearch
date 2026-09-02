@@ -24,10 +24,10 @@ renderer:
 
 | Component | File | Role |
 |---|---|---|
-| **EmotionNet** | `mlServer/neurotunes_model.py` | Maps a preprocessed profile to a 4-dim affective state `[arousal, valence, focus, energy]`, then to clinical music parameters. |
-| **RewardNet** | `mlServer/reward_model.py` | RLHF reward model trained on user/clinician feedback; drives periodic retraining. |
-| **Federated / site models** | `mlServer/site_client.py`, `federation/` | Local site models aggregated by a federated coordinator with secure aggregation + differential privacy. |
-| **Music generator** | `mlServer/music_generator.py` | Deterministic renderer: binaural-beat encoding + parameterized synthesis (not a learned generative audio model). |
+| **EmotionNet** | `ml-service/neurotunes_model.py` | Maps a preprocessed profile to a 4-dim affective state `[arousal, valence, focus, energy]`, then to clinical music parameters. |
+| **RewardNet** | `ml-service/reward_model.py` | RLHF reward model trained on user/clinician feedback; drives periodic retraining. |
+| **Federated / site models** | `ml-service/site_client.py`, `federation/` | Local site models aggregated by a federated coordinator with secure aggregation + differential privacy. |
+| **Music generator** | `ml-service/music_generator.py` | Deterministic renderer: binaural-beat encoding + parameterized synthesis (not a learned generative audio model). |
 
 ## 2. Intended use
 
@@ -85,7 +85,7 @@ scripts; they are **not** to be read as validated clinical efficacy.
 
 ## 6. Safety & limitations
 
-- A parameter **safety validator** (`mlServer/safety_boundaries.py`) hard-clamps
+- A parameter **safety validator** (`ml-service/safety_boundaries.py`) hard-clamps
   tempo, binaural frequency, duration, and unit-interval descriptors, and emits
   recommended-range warnings, before any track is returned.
 - A basic **IRB / informed-consent gate** (`verify_consent()` +
@@ -112,13 +112,13 @@ separately and supplied to a deployment at runtime.
   - Set **`WEIGHTS_PATH`** to the in-container directory the ML server should
     load from (consumed by `neurotunes_model.py` and `reward_model.py`).
     Defaults: `models` (EmotionNet) / `/app/models` (RewardNet) when unset.
-  - Or set **`WEIGHTS_DIR`** (host path) in `docker-compose-ml.yml` to mount
+  - Or set **`WEIGHTS_DIR`** (host path) in `deploy/docker-compose-ml.yml` to mount
     restored weights onto the default `/app/models` volume.
   - Example:
     ```bash
     # restore weights from the private repo (release asset or LFS), then:
     export WEIGHTS_DIR=/srv/neurotunes-weights
-    docker compose -f docker-compose-ml.yml up -d
+    docker compose -f deploy/docker-compose-ml.yml up -d
     ```
 - If no weights are present, EmotionNet bootstraps a fresh model from synthetic
   data so the platform still runs; RewardNet is trained on the first eligible
