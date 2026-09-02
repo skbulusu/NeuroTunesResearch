@@ -1,0 +1,44 @@
+# Dockerfile.netraiML
+
+# Use a modern, stable Python version.
+FROM python:3.11-slim
+
+# Set the working directory
+WORKDIR /app
+RUN mkdir /app/output /app/logs
+
+# Install the ONLY system library needed for MIDI synthesis.
+RUN apt-get update && apt-get install -y \
+    fluidsynth \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements file
+COPY mlServer/requirements.txt .
+
+# Install Python packages. This will now be fast and error-free.
+RUN pip install --upgrade pip
+#RUN pip install "setuptools<70.0.0"
+RUN pip install --no-cache-dir --timeout=1000 --retries=5 --trusted-host pypi.org --trusted-host pypi.python.org --trusted-host files.pythonhosted.org -r requirements.txt
+
+# Copy shared utilities FIRST
+#COPY shared/* .
+# Copy the rest of your application code
+COPY mlServer/. .
+
+RUN echo "=== /app contents ===" && ls -la /app/
+
+# Expose the port
+EXPOSE 5000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:5000/health || exit 1
+
+# Run the application under gunicorn (production WSGI server).
+# Single worker + threads preserves the in-process retraining scheduler and
+# federation coordinator state exactly as the old `flask run` dev server did
+# (see gunicorn.conf.py). Override worker/thread counts via env vars.
+#CMD ["python", "app.py"]
+#CMD ["flask", "run", "--host=0.0.0.0"]
+CMD ["gunicorn", "-c", "gunicorn.conf.py", "wsgi:app"]
