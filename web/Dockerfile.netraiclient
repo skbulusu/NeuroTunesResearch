@@ -1,0 +1,99 @@
+# Stage 1: Build the Next.js application
+FROM node:20-alpine AS builder
+
+# Set working directory
+WORKDIR /app
+
+# Define build-time arguments
+ARG BUILD_TIME
+ARG NEXT_PUBLIC_RECAPTCHA_SITE_KEY
+ARG NEXT_PUBLIC_TEST_VARIABLE
+
+# Set environment variables for build time
+ENV BUILD_TIME=$BUILD_TIME
+ENV NEXT_PUBLIC_RECAPTCHA_SITE_KEY=$NEXT_PUBLIC_RECAPTCHA_SITE_KEY
+ENV NEXT_PUBLIC_TEST_VARIABLE=$NEXT_PUBLIC_TEST_VARIABLE
+
+# Copy package.json and package-lock.json
+COPY package*.json ./
+
+# Install ALL dependencies (including devDependencies).
+# `next build` requires devDeps such as @tailwindcss/postcss, postcss,
+# tailwindcss and typescript, so a production-only install fails the build.
+# This is the builder stage; the final runtime image is a separate stage.
+RUN npm ci --legacy-peer-deps
+
+# Copy the rest of the application source code
+COPY . .
+
+# Ensure next.config.js has proper output configuration
+RUN echo "Checking next.config.js for standalone output..."
+
+# Build the Next.js application
+RUN npm run build
+
+# Stage 2: Create the final production image
+FROM node:20-alpine AS runner
+
+# Set working directory
+WORKDIR /app
+
+# Set environment to production
+ENV NODE_ENV=production
+
+# Disable Next.js telemetry
+ENV NEXT_TELEMETRY_DISABLED=1
+
+# Create a non-root user
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
+
+# Install wget for health checks
+RUN apk add --no-cache wget curl wget dumb-init && rm -rf /var/cache/apk/*
+
+# Create necessary directories with proper permissions
+RUN mkdir -p /app/.next/cache /app/.next/static /app/public \
+    && chown -R nextjs:nodejs /app
+
+# Copy the standalone output from the builder stage
+#COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+#COPY --from=builder --chown=nextjs:nodejs /app/public ./public
+# Copy static assets with verification
+#COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+# Add this line to ensure proper static file serving
+#COPY --from=builder --chown=nextjs:nodejs /app/next.config.js ./next.config.js
+
+# Copy the built Next.js application from the builder stage
+COPY --from=builder --chown=nextjs:nodejs /app/package*.json ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next ./.next
+COPY --from=builder --chown=nextjs:nodejs /app/public ./public
+COPY --from=builder --chown=nextjs:nodejs /app/next.config.js ./next.config.js
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
+
+# Verify static assets were copied correctly
+RUN ls -la .next/static/ || echo "No static assets found"
+RUN ls -la .next/static/css/
+
+# Switch to non-root user
+USER nextjs
+
+# Expose the port the app runs on
+EXPOSE 3001
+
+# Set hostname and port name
+ENV HOSTNAME="0.0.0.0"
+ENV PORT=3001
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD wget --no-verbose --tries=1 --spider http://localhost:3001/api/health || exit 1
+
+# Use dumb-init to handle signals properly
+ENTRYPOINT ["dumb-init", "--"]
+
+# Command to run the application
+# Add this line before the CMD
+RUN ls -la ./
+#CMD ["node", "server.js"]
+#CMD ["node", ".next/standalone/server.js"]
+CMD ["npm", "start"]
