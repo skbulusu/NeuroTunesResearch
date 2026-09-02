@@ -1,0 +1,27 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    gcc \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements and install Python dependencies
+COPY clinical/requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy shared utilities
+COPY shared/ ./shared/
+
+# Copy clinical service files
+COPY clinical/ .
+
+# Create logs directory
+RUN mkdir -p /app/logs
+
+# Expose ports (Flask on 5003, Streamlit on 8501)
+EXPOSE 5003 8501
+
+# Run Flask wrapper which starts Streamlit
+CMD ["python", "clinical_app.py"]
