@@ -1,0 +1,8 @@
+RewardNet (RLHF) results
+  simulated preference pairs: 206384
+  Bradley-Terry ranking accuracy: train=0.894 test=0.888
+  reward input dim: 89+4
+  saved weights   -> rewardnet_v3.pt
+  saved preprocess-> rewardnet_v3_preprocess.joblib
+  saved meta      -> rewardnet_v3_meta.json
+  real-feedback hook: no real_feedback.csv yet (drop one in to fine-tune on listener data)

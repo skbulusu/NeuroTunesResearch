@@ -1,0 +1,4 @@
+model,params,R2_vs_true_mean,R2_vs_true_std
+Teacher ensemble (Kx wide),86988,0.9452,0.0023
+Student — hard labels (baseline),4196,0.829,0.0706
+Student — DISTILLED,4196,0.8264,0.041

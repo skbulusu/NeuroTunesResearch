@@ -1,0 +1,232 @@
+
+==================================================================
+BALANCED SET (training)  (n=206433)
+==================================================================
+
+Conditions covered: 14/14
+  PTSD             15149  (  7.3%)
+  Anxiety          15093  (  7.3%)
+  Parkinsons       15059  (  7.3%)
+  Dementia         14877  (  7.2%)
+  Chronic-Stress   14828  (  7.2%)
+  Panic-Disorder   14745  (  7.1%)
+  Autism           14745  (  7.1%)
+  Chronic-Pain     14656  (  7.1%)
+  TBI              14602  (  7.1%)
+  Depression       14588  (  7.1%)
+  Insomnia         14573  (  7.1%)
+  Post-Stroke      14516  (  7.0%)
+  Healthy          14505  (  7.0%)
+  ADHD             14497  (  7.0%)
+
+Target valence/arousal quadrants:
+  happy/excited (v+ a+)    86616  ( 42.0%)
+  calm/content (v+ a-)     101194  ( 49.0%)
+  anxious/tense (v- a+)     1322  (  0.6%)
+  sad/low (v- a-)          17301  (  8.4%)
+  --> negative-valence (iso-principle match targets):   9.0%
+
+Arousal axis: high/activating  42.6%  |  low/calming  57.4%
+
+severity:
+  moderate         92273  ( 44.7%)
+  mild             72866  ( 35.3%)
+  severe           41294  ( 20.0%)
+
+comorbidity:
+  none             133765  ( 64.8%)
+  Depression       22227  ( 10.8%)
+  Anxiety          21339  ( 10.3%)
+  Insomnia         13021  (  6.3%)
+  Chronic-Stress    4152  (  2.0%)
+  Chronic-Pain      3926  (  1.9%)
+  Dementia          1714  (  0.8%)
+  ADHD              1658  (  0.8%)
+  PTSD              1611  (  0.8%)
+  Panic-Disorder    1258  (  0.6%)
+  Autism            1135  (  0.5%)
+  Parkinsons         627  (  0.3%)
+
+medication_state:
+  on               117768  ( 57.0%)
+  none             58594  ( 28.4%)
+  off              30071  ( 14.6%)
+
+time_of_day:
+  afternoon        82869  ( 40.1%)
+  morning          65230  ( 31.6%)
+  evening          58334  ( 28.3%)
+
+gender:
+  Male             100589  ( 48.7%)
+  Female           98157  ( 47.5%)
+  Other             7687  (  3.7%)
+
+------------------------------------------------------------------
+RICH PATIENT-REALISM AXES
+------------------------------------------------------------------
+
+distinct patients: 18494  |  sessions/patient: min=3 max=25 mean=11.2
+
+archetype:
+  gradual_responder 89356  ( 43.3%)
+  rapid_responder  45477  ( 22.0%)
+  non_responder    36258  ( 17.6%)
+  relapsing_remitting 35342  ( 17.1%)
+
+medication_adherence:
+  adherent         80749  ( 39.1%)
+  partial          45165  ( 21.9%)
+  non_adherent     21925  ( 10.6%)
+
+chronotype:
+  intermediate     91952  ( 44.5%)
+  morning          62569  ( 30.3%)
+  evening          51912  ( 25.1%)
+
+social_support:
+  moderate         104156  ( 50.5%)
+  high             52308  ( 25.3%)
+  low              49969  ( 24.2%)
+
+illness_duration_years: min=0 max=29.9 mean=7.42 sd=5.63
+
+comorbidity_count: min=0 max=2 mean=0.46 sd=0.68
+
+baseline_cognition: min=0 max=10 mean=6.91 sd=1.96
+
+motor_function: min=1 max=10 mean=7.67 sd=1.89
+
+sensory_sensitivity: min=2 max=10 mean=5.45 sd=1.69
+
+trait_anxiety: min=2 max=10 mean=5.98 sd=1.69
+
+music_engagement: min=0 max=10 mean=6.12 sd=2.11
+
+life_event: min=0 max=1 mean=0.09 sd=0.28
+
+sessions with an acute life event: 17953  (  8.7%)
+
+age: min=5 max=95 mean=45.1 sd=18.7
+
+label confidence: mean=0.520 min=0.042 max=0.916
+  flagged for human review (conf<0.5): 90229  ( 43.7%)
+  disagreement: mean=0.0704 max=0.3175
+
+==================================================================
+NATURAL-PREVALENCE SET (honest eval)  (n=84898)
+==================================================================
+
+Conditions covered: 14/14
+  Anxiety          15337  ( 18.1%)
+  Depression       13781  ( 16.2%)
+  Healthy           7183  (  8.5%)
+  ADHD              6996  (  8.2%)
+  Chronic-Stress    6789  (  8.0%)
+  Insomnia          6345  (  7.5%)
+  Chronic-Pain      5691  (  6.7%)
+  PTSD              4408  (  5.2%)
+  Post-Stroke       4244  (  5.0%)
+  Parkinsons        3619  (  4.3%)
+  Dementia          3531  (  4.2%)
+  Panic-Disorder    2432  (  2.9%)
+  TBI               2322  (  2.7%)
+  Autism            2220  (  2.6%)
+
+Target valence/arousal quadrants:
+  happy/excited (v+ a+)    32132  ( 37.8%)
+  calm/content (v+ a-)     44313  ( 52.2%)
+  anxious/tense (v- a+)      435  (  0.5%)
+  sad/low (v- a-)           8018  (  9.4%)
+  --> negative-valence (iso-principle match targets):  10.0%
+
+Arousal axis: high/activating  38.4%  |  low/calming  61.6%
+
+severity:
+  moderate         38182  ( 45.0%)
+  mild             29942  ( 35.3%)
+  severe           16774  ( 19.8%)
+
+comorbidity:
+  none             55836  ( 65.8%)
+  Depression        7900  (  9.3%)
+  Anxiety           7719  (  9.1%)
+  Insomnia          5272  (  6.2%)
+  Chronic-Pain      2646  (  3.1%)
+  Chronic-Stress    2336  (  2.8%)
+  Panic-Disorder    1221  (  1.4%)
+  PTSD               634  (  0.7%)
+  Autism             589  (  0.7%)
+  ADHD               368  (  0.4%)
+  Dementia           261  (  0.3%)
+  Parkinsons         116  (  0.1%)
+
+medication_state:
+  on               51548  ( 60.7%)
+  none             20436  ( 24.1%)
+  off              12914  ( 15.2%)
+
+time_of_day:
+  afternoon        34249  ( 40.3%)
+  morning          26911  ( 31.7%)
+  evening          23738  ( 28.0%)
+
+gender:
+  Female           41004  ( 48.3%)
+  Male             40190  ( 47.3%)
+  Other             3704  (  4.4%)
+
+------------------------------------------------------------------
+RICH PATIENT-REALISM AXES
+------------------------------------------------------------------
+
+distinct patients: 7600  |  sessions/patient: min=3 max=25 mean=11.2
+
+archetype:
+  gradual_responder 37687  ( 44.4%)
+  rapid_responder  18458  ( 21.7%)
+  non_responder    14496  ( 17.1%)
+  relapsing_remitting 14257  ( 16.8%)
+
+medication_adherence:
+  adherent         35914  ( 42.3%)
+  partial          19180  ( 22.6%)
+  non_adherent      9368  ( 11.0%)
+
+chronotype:
+  intermediate     37968  ( 44.7%)
+  morning          25906  ( 30.5%)
+  evening          21024  ( 24.8%)
+
+social_support:
+  moderate         42458  ( 50.0%)
+  high             21660  ( 25.5%)
+  low              20780  ( 24.5%)
+
+illness_duration_years: min=0 max=29.6 mean=7.58 sd=5.57
+
+comorbidity_count: min=0 max=2 mean=0.45 sd=0.67
+
+baseline_cognition: min=0 max=10 mean=7.32 sd=1.66
+
+motor_function: min=1 max=10 mean=8.09 sd=1.64
+
+sensory_sensitivity: min=2 max=10 mean=5.23 sd=1.57
+
+trait_anxiety: min=2 max=10 mean=6.26 sd=1.62
+
+music_engagement: min=0 max=10 mean=6.16 sd=2.13
+
+life_event: min=0 max=1 mean=0.09 sd=0.28
+
+sessions with an acute life event: 7481  (  8.8%)
+
+age: min=5 max=94 mean=43.5 sd=16.6
+
+label confidence: mean=0.526 min=0.041 max=0.920
+  flagged for human review (conf<0.5): 35702  ( 42.1%)
+  disagreement: mean=0.0691 max=0.3186
+
+==================================================================
+TOTAL ROWS ACROSS BOTH SETS: 291331
+==================================================================

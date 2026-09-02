@@ -1,0 +1,15 @@
+EmotionNet v3 training proof
+  train=balanced (206433)  eval=natural (84898)
+  input_dim=89  arch=input->64->32->4 (tanh)
+  features: numeric=['age', 'stress_level', 'sleep_quality', 'energy_levels', 'session_number', 'illness_duration_years', 'comorbidity_count', 'baseline_cognition', 'motor_function', 'sensory_sensitivity', 'trait_anxiety', 'music_engagement', 'life_event']
+            categ=['gender', 'diagnosis', 'therapy_goal', 'mood', 'severity', 'comorbidity', 'time_of_day', 'medication_state', 'archetype', 'medication_adherence', 'chronotype', 'social_support']
+  overall R^2 unweighted        = +0.938
+  overall R^2 confidence-weighted = +0.938
+  per-target (confidence-weighted):
+    arousal  +0.965
+    valence  +0.884
+    focus    +0.953
+    calm     +0.952
+  saved weights   -> emotionnet_v3.pt
+  saved preprocess-> emotionnet_v3_preprocess.joblib
+  saved meta      -> emotionnet_v3_meta.json

@@ -1,0 +1,49 @@
+{
+  "description": "Post-fix (commit bd64b73) Music2Emo audio critic on the production MusicGenerator. Grid=4 (16 intended VA targets) x 4 seeds (0-3). Depression / Apathy & Mood Regulation.",
+  "critic": "Music2Emo (AMAAI-Lab, Apache-2.0, MERT-based)",
+  "diagnosis": "Depression",
+  "therapy_goal": "Apathy & Mood Regulation",
+  "grid_side": 4,
+  "targets_per_seed": 16,
+  "seeds": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "total_tracks": 64,
+  "pearson_arousal_mean": 0.5013977648815112,
+  "pearson_arousal_std": 0.10254861591762385,
+  "pearson_valence_mean": 0.45489331777525616,
+  "pearson_valence_std": 0.03272278864314601,
+  "spearman_arousal_mean": 0.5397058823529411,
+  "spearman_arousal_std": 0.10189595412541178,
+  "spearman_valence_mean": 0.6058823529411765,
+  "spearman_valence_std": 0.04494325526451797,
+  "per_seed": {
+    "0": {
+      "pearson_arousal": 0.37487293116398596,
+      "pearson_valence": 0.4450621110570571,
+      "spearman_arousal": 0.43529411764705883,
+      "spearman_valence": 0.5470588235294118
+    },
+    "1": {
+      "pearson_arousal": 0.4922475404836584,
+      "pearson_valence": 0.5071359069939949,
+      "spearman_arousal": 0.5323529411764706,
+      "spearman_valence": 0.6735294117647058
+    },
+    "2": {
+      "pearson_arousal": 0.6608015367784619,
+      "pearson_valence": 0.4169870254921097,
+      "spearman_arousal": 0.7058823529411764,
+      "spearman_valence": 0.6
+    },
+    "3": {
+      "pearson_arousal": 0.47766905109993874,
+      "pearson_valence": 0.45038822755786284,
+      "spearman_arousal": 0.4852941176470588,
+      "spearman_valence": 0.6029411764705882
+    }
+  }
+}
