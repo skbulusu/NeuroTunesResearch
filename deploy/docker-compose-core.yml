@@ -1,0 +1,140 @@
+# NeuroTunes Core Services - Machine 1
+# Handles web interface, database, and system orchestration
+#version: '3.8'
+
+# Define default resource constraints
+x-default-resources: &default-resources
+  deploy:
+    resources:
+      limits:
+        cpus: '1'
+        memory: 1024M
+
+services:
+  netrai-client:
+    container_name: netrai-client
+    build:
+      context: ./client
+      dockerfile: Dockerfile.netraiclient
+    restart: on-failure:1
+    networks:
+      - netrai-clientnetwork
+      - neurotunes-cluster
+    <<: *default-resources
+    depends_on:
+      - netrai-server
+    environment:
+      - ML_SERVER_URL=http://${ML_MACHINE_IP:-192.168.1.11}:5000
+    ports:
+      - "3001:3001"
+
+  netrai-server:
+    container_name: netrai-server
+    build:
+      context: ./server
+      dockerfile: Dockerfile.netraiserver
+    restart: on-failure:1
+    extra_hosts:
+      - "ml-server:192.168.10.141"
+    volumes:
+      - './server/voice_uploads:/app/voice_uploads'
+      - './server/uploads:/app/uploads'
+    environment:  
+      - FLASK_ENV=development
+      - ML_SERVER_URL=http://${ML_MACHINE_IP:-192.168.1.11}:5000
+      - FEDERATION_COORDINATOR_URL=http://${ML_MACHINE_IP:-192.168.1.11}:5001
+      - dbHost=${DB_HOST:-netrai-db}
+      - dbName=${DB_DATABASE}
+      - dbUsername=${DB_USER}
+      - dbPWD=${DB_PASSWORD}
+      - CORE_MACHINE_IP=${CORE_MACHINE_IP:-192.168.1.10}
+      - ML_MACHINE_IP=${ML_MACHINE_IP:-192.168.1.11}
+      - ML_MACHINE_IP1=${ML_MACHINE_IP1:-192.168.10.141}
+      - ML_MACHINE_IP2=${ML_MACHINE_IP2:-192.168.10.224}
+      - PORT=${FILE_UPLOADS_MODULE_PORT:-4001}
+    ports:
+      - "4000:4000"
+    networks:
+      - netrai-clientnetwork
+      - netrai-dbnetwork
+      - neurotunes-cluster
+    <<: *default-resources
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    depends_on:
+      - netrai-db
+
+  netrai-db:
+    image: mysql:8.3
+    container_name: netrai-db
+    networks:
+      - netrai-dbnetwork
+      - neurotunes-cluster
+    restart: unless-stopped
+    environment:  
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${DB_DATABASE}
+      - MYSQL_USER=${DB_USER}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+      - MYSQL_ALLOW_LOCAL_INFILE=1
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./dbScripts/netraidb_full_backup_with_versioning.sql.gz:/tmp/backup.sql.gz:ro
+      - ./dbScripts/init-from-compressed.sh:/docker-entrypoint-initdb.d/01-init-from-compressed.sh:ro
+      - ./mysql-config/my-custom.cnf:/etc/mysql/conf.d/my-custom.cnf:ro  
+    ports:
+      - "3306:3306"
+    <<: *default-resources
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  caddy:
+    container_name: caddy
+    image: caddy:2-alpine
+    restart: unless-stopped
+    networks:
+      - netrai-clientnetwork
+      - neurotunes-cluster
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./caddyScripts/Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data  
+    <<: *default-resources
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  netrai-clientnetwork:
+    driver: bridge
+  netrai-dbnetwork:
+    driver: bridge
+  neurotunes-cluster:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+volumes:
+  mysql-data:
+  caddy_data:

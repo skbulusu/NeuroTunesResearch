@@ -1,0 +1,187 @@
+# NeuroTunes ML Services - Machine 2
+# Handles ML processing, federation, and model versioning
+
+# Define default resource constraints
+x-default-resources: &default-resources
+  deploy:
+    resources:
+      limits:
+        cpus: '4'
+        memory: 8196M
+
+services:
+  netrai-mlserver:
+    container_name: netrai-mlserver
+    build:
+      context: .
+      dockerfile: mlServer/Dockerfile.netraiML
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=development
+      - ML_SERVER_URL=http://0.0.0.0:5000
+      - DB_HOST=${CORE_MACHINE_IP:-192.168.10.151}
+      - DB_DATABASE=${DB_DATABASE}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_PORT=3306
+      - USE_SYNTHETIC_DATA=${USE_SYNTHETIC_DATA:-true}
+      - FEDERATION_MODE=${FEDERATION_MODE:-coordinator}
+      - FEDERATION_PORT=${FEDERATION_PORT:-5001}
+      - SITE_ID=${SITE_ID:-site_001}
+      - COORDINATOR_URL=http://localhost:5001
+      - PRIVACY_BUDGET=${PRIVACY_BUDGET:-1.0}
+      - MIN_CLIENTS=${MIN_CLIENTS:-2}
+      - CORE_MACHINE_IP=${CORE_MACHINE_IP:-192.168.10.151}
+      - ML_MACHINE_IP=${ML_MACHINE_IP:-192.168.10.141}
+      # Optional: point the model loader at an externally-supplied weights
+      # directory (e.g. weights restored from the private netrai/neurotunes-weights
+      # repo). Leave empty to use the in-container /app/models default. See MODEL_CARD.md.
+      - WEIGHTS_PATH=${WEIGHTS_PATH:-}
+    volumes:
+      - ./mlServer/output:/app/output
+      # Default weights live here; override the host side to mount restored
+      # weights, e.g. WEIGHTS_DIR=/srv/neurotunes-weights (see MODEL_CARD.md).
+      - ${WEIGHTS_DIR:-./mlServer/models}:/app/models
+      - ./mlServer:/app
+    networks:
+      - neurotunes-ml-network
+      - neurotunes-cluster
+    <<: *default-resources
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    depends_on:
+      - federation-coordinator
+
+  federation-coordinator:
+    container_name: federation-coordinator
+    build:
+      context: .
+      dockerfile: federation/Dockerfile.federation
+    environment:
+      - FLASK_ENV=development
+      - FEDERATION_PORT=5001
+      - DB_HOST=${CORE_MACHINE_IP:-192.168.10.151}
+      - DB_DATABASE=${DB_DATABASE}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_PORT=3306
+      - MIN_SITES=${MIN_SITES:-2}
+      - MAX_SITES=${MAX_SITES:-10}
+      - PRIVACY_EPSILON=${PRIVACY_EPSILON:-1.0}
+      - CORE_MACHINE_IP=${CORE_MACHINE_IP:-192.168.10.151}
+      - ML_MACHINE_IP=${ML_MACHINE_IP:-192.168.10.141}
+    volumes:
+      - ./federation:/app
+      - federation-models:/app/models
+    ports:
+      - "5001:5001"
+    networks:
+      - neurotunes-ml-network
+      - neurotunes-cluster
+    <<: *default-resources
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  model-versioning:
+    container_name: model-versioning
+    build:
+      context: .
+      dockerfile: versioning/Dockerfile.versioning
+    ports:
+      - "5002:5002"
+    networks:
+      - neurotunes-ml-network
+      - neurotunes-cluster
+    environment:
+      - FLASK_ENV=development
+      - VERSIONING_PORT=5002
+      - DB_HOST=${CORE_MACHINE_IP:-192.168.10.151}
+      - DB_DATABASE=${DB_DATABASE}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_PORT=3306
+      - MODEL_STORAGE_PATH=/app/models/versions
+      - CORE_MACHINE_IP=${CORE_MACHINE_IP:-192.168.10.151}
+      - ML_MACHINE_IP=${ML_MACHINE_IP:-192.168.10.141}
+    volumes:
+      - ./versioning:/app
+      - model-versions:/app/models/versions
+    <<: *default-resources
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5002/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  clinical-dashboard:
+    container_name: clinical-dashboard
+    build:
+      context: .
+      dockerfile: clinical/Dockerfile.clinical
+    ports:
+      - "5003:5003"
+    networks:
+      - neurotunes-ml-network
+      - neurotunes-cluster
+    environment:
+      - FLASK_ENV=development
+      - CLINICAL_DASHBOARD_PORT=5003
+      - DB_HOST=${CORE_MACHINE_IP:-192.168.10.151}
+      - DB_DATABASE=${DB_DATABASE}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_PORT=3306
+      - CORE_MACHINE_IP=${CORE_MACHINE_IP:-192.168.10.151}
+      - ML_MACHINE_IP=${ML_MACHINE_IP:-192.168.10.141}
+    volumes:
+      - ./clinical:/app
+      - clinical-reports:/app/reports
+    <<: *default-resources
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5003/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+networks:
+  neurotunes-ml-network:
+    driver: bridge
+  neurotunes-cluster:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+volumes:
+  federation-models:
+  model-versions:
+  synthetic-data:
+  clinical-reports:

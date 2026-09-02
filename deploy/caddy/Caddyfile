@@ -1,0 +1,36 @@
+netr.ai www.netr.ai {
+
+  # Enable logging to standard output, which you can see with 'docker logs caddy'
+  log
+
+  # Apply these security headers to all responses from your site
+  header {
+    Strict-Transport-Security "max-age=31536000;"
+    X-Frame-Options "DENY"
+    X-Content-Type-Options "nosniff"
+    Referrer-Policy "strict-origin-when-cross-origin"
+    # Note: The CSP header you had is now a default behavior in Caddy's automatic HTTPS
+    # but it's fine to leave it for clarity.
+  }
+
+  # --- Request Routing ---
+  # The order of these handlers is important. Caddy checks them from top to bottom.
+
+  # 1. Handle requests for the CORS proxy
+  handle /cors-proxy* {
+    reverse_proxy netrai-server:4000
+  }
+
+  # 2. Handle all other API requests
+  handle /api* {
+    reverse_proxy netrai-server:4000
+  }
+
+  # 3. Handle all other requests (the "catch-all") by sending them to the frontend
+  # This MUST be the last handler.
+  handle {
+    reverse_proxy netrai-client:3001
+  }
+}
+
+
