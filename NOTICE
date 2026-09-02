@@ -1,0 +1,28 @@
+NeuroTunes Research Platform — Paper Companion Repository
+Copyright 2026 Sai Karthik Bulusu
+
+This repository contains a subset of the NeuroTunes source code and
+reproducibility artifacts released as supplementary material for the paper
+"NeuroTunes: An Open, Reproducible Platform for Clinicians and Researchers
+to Build and Audit Therapeutic Music Generation" (GenAI4Health @
+NeurIPS 2026, Demonstration Track).
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+this software except in compliance with the License. You may obtain a copy of
+the License in the LICENSE file at the root of this repository or at
+http://www.apache.org/licenses/LICENSE-2.0
+
+--------------------------------------------------------------------------------
+Patents
+--------------------------------------------------------------------------------
+The methods implemented here are the subject of a pending U.S. patent
+application ("Patent Pending"). The Apache-2.0 license grants the copyright and
+patent rights stated in that license for this source code; it does not waive,
+transfer, or grant any additional patent rights beyond its own terms.
+
+--------------------------------------------------------------------------------
+Model weights
+--------------------------------------------------------------------------------
+The source code in this repository is open source. Trained model weights are
+NOT distributed in this repository ("open source, closed weights"). See
+MODEL_CARD.md for details.
