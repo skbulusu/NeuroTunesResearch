@@ -1,0 +1,9 @@
+# NeuroTunes distillation experiment — pinned for reproducibility.
+# scikit-learn is pinned to 1.7.1 because the deployed NeuroTunes preprocessors
+# (models/*.pkl) were saved with 1.7.1; other versions raise
+# InconsistentVersionWarning and can silently change transform output.
+numpy>=1.24,<2.3
+pandas>=2.0
+scikit-learn==1.7.1
+torch>=2.0
+matplotlib>=3.7
