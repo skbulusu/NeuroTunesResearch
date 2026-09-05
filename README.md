@@ -7,8 +7,7 @@ not a medical device. We don't make any clinical efficacy claims.
 ## Overview
 
 Before any human study or IRB protocol, we wanted a way to build, run, and
-stress-test a therapeutic-music pipeline end-to-end -- not just as an offline
-model, but as a real platform three kinds of users can actually touch. This
+stress-test a therapeutic-music pipeline end-to-end. This
 repo has the pieces that make both the platform and its evaluation
 reproducible:
 
@@ -75,7 +74,7 @@ pip install -r requirements.txt
 ./run_all.sh
 ```
 
-### Individual pieces (self-contained)
+### Individual Components
 
 ```bash
 cd code/dataset
