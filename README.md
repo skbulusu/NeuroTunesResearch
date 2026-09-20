@@ -11,27 +11,21 @@ Santa Clara, California
 
 [Website](https://www.netr.ai) · [Demo](https://www.youtube.com/watch?v=Rqx6QJ0Lidc) · [Email](mailto:skbulusu@gmail.com)
 
-Licensed under the Apache-2.0 License.
-
 ---
 
 ## Overview
 
-Personalized music therapy sits at the intersection of music cognition, neuroscience, and machine learning. However, developing and evaluating these systems presents several challenges:
+Personalized music therapy brings together machine learning, neuroscience, and music cognition. Developing these systems involves challenges such as limited patient-response data, expensive expert annotation, and the difficulty of evaluating models before clinical studies.
 
-- **Limited data:** Patient-response data is difficult to collect, especially across different conditions and over long periods.
-- **Expensive annotation:** Expert affect labeling requires time from trained professionals.
-- **Unclear evaluation:** A model can reproduce its own training labels without producing clinically meaningful results.
+NeuroTunes focuses on the **pre-clinical research stage**, providing an environment for developing, testing, and evaluating individualized music-generation systems.
 
-NeuroTunes focuses on the **pre-clinical research stage**. It provides a controlled environment for developing, testing, and evaluating music-generation models before any human study or clinical deployment.
+The project uses synthetic data and computational evaluation to explore these ideas. It does not claim to demonstrate clinical efficacy or replace professional therapy.
 
-The project does not claim to demonstrate clinical efficacy.
-
-## What It Does
+## How It Works
 
 NeuroTunes generates music from an individual's target affective profile rather than selecting tracks from an existing music library.
 
-The pipeline follows a single, logged workflow:
+The pipeline follows a logged workflow:
 
 ```text
 Assessment
@@ -45,160 +39,64 @@ Safety Validator
 Generated Audio + Session Log
 ```
 
-### Main components
+### Components
 
-- **EmotionNet:** Maps a profile to target dimensions such as arousal, valence, focus, and calm.
-- **MusicGenerator:** Converts the target into MIDI and audio using a deterministic, parametric renderer.
-- **Safety Validator:** Applies hard limits to tempo, binaural frequency, and duration.
-- **RewardNet:** Learns from simulated session feedback.
-- **Retraining Scheduler:** Uses champion/challenger evaluation to determine whether a new model should replace the current one.
+#### EmotionNet
 
-The audio renderer is not a learned generative audio model. It uses explicit parameters and deterministic rendering to make its behavior easier to inspect and reproduce.
+Maps an individual's profile to target dimensions such as:
 
-## Research Highlights
+- Arousal
+- Valence
+- Focus
+- Calm
 
-### Synthetic longitudinal cohort
+#### MusicGenerator
 
-- 291,331 rows
-- 26,094 simulated patients
-- 14 neurological and psychiatric conditions
-- Longitudinal patient trajectories
+Converts the target affective profile into MIDI and audio using a deterministic, parametric renderer.
 
-The cohort uses documented realism axes, including medication adherence, chronotype, comorbidity, and response archetypes. These are intended to produce structured variation rather than independent random samples.
+The renderer provides explicit control over musical parameters, including tempo, musical mode, and binaural frequency.
 
-The cohort is synthetic and does not represent real patient outcomes.
+Unlike learned generative audio models, the renderer is designed to make its behavior inspectable and reproducible.
 
-### LLM-based annotation
+#### Safety Validator
 
-An open-weight Qwen2.5-7B model produces soft affect targets at scale.
+Applies hard constraints to generated music, including:
 
-NeuroTunes uses an ensemble and uncertainty model to identify labels that may require human review. Approximately 42–44% of labels are flagged by the confidence gate.
+- Tempo
+- Binaural frequency
+- Duration
 
-The LLM is treated as a scalable prior, not as clinical ground truth.
+These constraints are intended to limit the range of generated outputs. They do not establish clinical safety.
 
-### EmotionNet
+#### RewardNet
 
-The compact EmotionNet model has approximately 8,000 parameters.
+Uses logged feedback to train a reward model that supports experimentation with feedback-driven personalization.
 
-It reconstructs the ensemble targets with an R² of 0.938 on the reported evaluation.
+#### Retraining Scheduler
 
-This measures self-consistency with the generated labels. It does not establish clinical validity.
+Uses a champion/challenger evaluation process to compare updated models against the current model.
 
-### Independent audio evaluation
+A new model is promoted only when it meets the defined evaluation criteria. Otherwise, the existing model is retained.
 
-An independent MERT-based audio critic identified an affect-inversion bug in the renderer:
+## Research Infrastructure
 
-| Metric | Before fix | After fix |
-|---|---:|---:|
-| Arousal correlation | -0.43 | +0.50 |
-| Valence correlation | Not reported | +0.46 |
+NeuroTunes includes infrastructure for reproducible experimentation:
 
-The results demonstrate why evaluating a system only against its own labels can miss important failures.
-
-The reported correlations are research evaluation results, not clinical validation.
-
-## How It Extends Existing Research
-
-NeuroTunes brings together ideas from several areas of research:
-
-| Existing research | Limitation | NeuroTunes approach |
-|---|---|---|
-| Music-emotion datasets | Usually annotate music rather than patient trajectories | Synthetic patient × session data across 14 conditions |
-| Generative audio models | Can be difficult to inspect and reproduce | Deterministic renderer with explicit parameters |
-| LLM-based annotation | LLM outputs can be mistaken for ground truth | Soft priors, ensemble targets, and confidence gating |
-| Self-consistency evaluation | Can miss directional failures | Independent audio critic and adversarial evaluation |
-
-The goal is not to replace existing research, but to provide a testbed for studying the connections between these approaches.
-
-## Running
-
-> Instructions will be expanded as the repository is finalized.
-
-### Requirements
-
-- Python 3.10+
-- PyTorch
-- NumPy
-- Pandas
-- Audio and MIDI dependencies listed in `requirements.txt`
-
-### Installation
-
-```bash
-git clone https://github.com/YOUR_USERNAME/NeuroTunesDemoTrack.git
-cd NeuroTunesDemoTrack
-
-python -m venv .venv
-source .venv/bin/activate
-
-pip install -r requirements.txt
-```
-
-### Run the pipeline
-
-```bash
-python main.py
-```
-
-The exact entry points and configuration options may change as development continues. Refer to the repository's implementation and configuration files for the current workflow.
-
-## Reproducibility
-
-NeuroTunes is designed around reproducible experimentation.
-
-Planned and implemented infrastructure includes:
-
-- Deterministic, multi-seed retraining
+- Synthetic longitudinal patient cohort
+- LLM-assisted soft affect annotation
+- Confidence-based review gating
+- Deterministic, parametric audio generation
+- Logged sessions and evaluation
+- Multi-seed retraining
 - Model weight verification
-- Logged training and evaluation runs
-- Champion/challenger model comparison
-- Configurable safety constraints
-- A consent-gated `/api/v1` research interface
+- Research API with consent gating
 - Simulated federated learning and differential privacy components
 
-Some components are experimental and should not be interpreted as production-ready clinical infrastructure.
-
-## Evaluation and Limitations
-
-NeuroTunes is built around a simple principle: **a model should not be considered successful merely because it agrees with its own labels.**
-
-The project reports both positive and negative results, including bugs discovered during independent evaluation.
-
-Current limitations include:
-
-- The patient cohort is synthetic.
-- LLM-generated labels are not clinical ground truth.
-- Self-consistency metrics do not establish therapeutic benefit.
-- Audio correlations do not establish clinical efficacy.
-- The safety validator does not guarantee clinical safety.
-- Federated learning and privacy components are simulated where applicable.
-
-Clinical research, human studies, and IRB-approved evaluation are future work.
-
-## Potential Research Applications
-
-NeuroTunes may be useful as an experimental platform for researchers working in:
-
-- Music cognition
-- Rhythmic entrainment
-- Affective computing
-- Machine learning for mental health
-- Reinforcement learning from human feedback
-- Personalized audio generation
-
-The platform provides explicit control over parameters such as tempo, musical mode, and binaural frequency, along with session logging for reproducible experiments.
-
-It is intended to support research, not replace therapists or provide medical treatment.
-
-## Project Status
-
-NeuroTunes is an ongoing research and education project.
-
-The system is being developed to make the pre-clinical modeling process more transparent, reproducible, and easier to evaluate. Features and evaluation protocols may change as the project develops.
+All results are based on synthetic or practice data. The platform is intended for research and education, not clinical deployment.
 
 ## License
 
-This project is licensed under the **Apache-2.0 License**.
+NeuroTunes is licensed under the **Apache-2.0 License**.
 
 See [LICENSE](LICENSE) for details.
 
@@ -206,8 +104,9 @@ See [LICENSE](LICENSE) for details.
 
 **Sai Karthik Bulusu**
 
-- Email: skbulusu@gmail.com
-- Website: https://www.netr.ai
-- Demo: https://www.youtube.com/watch?v=Rqx6QJ0Lidc
+- Email: [skbulusu@gmail.com](mailto:skbulusu@gmail.com)
+- Website: [www.netr.ai](https://www.netr.ai)
+- Demo: [YouTube](https://www.youtube.com/watch?v=Rqx6QJ0Lidc)
+- GitHub: [NeuroTunesDemoTrack](https://github.com/YOUR_USERNAME/NeuroTunesDemoTrack)
 
 Feedback, research suggestions, and collaboration inquiries are welcome.
