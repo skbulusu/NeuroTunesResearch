@@ -107,6 +107,6 @@ See [LICENSE](LICENSE) for details.
 - Email: [skbulusu@gmail.com](mailto:skbulusu@gmail.com)
 - Website: [www.netr.ai](https://www.netr.ai)
 - Demo: [YouTube](https://www.youtube.com/watch?v=Rqx6QJ0Lidc)
-- GitHub: [NeuroTunesDemoTrack](https://github.com/YOUR_USERNAME/NeuroTunesDemoTrack)
+- GitHub: [NeuroTunesResearch](https://github.com/skbulusu/NeuroTunesResearch)
 
 Feedback, research suggestions, and collaboration inquiries are welcome.
